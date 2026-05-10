@@ -62,8 +62,6 @@ async fn main() {
 }
 
 async fn home(State(state): State<Arc<AppState>>, session: Session) -> Html<String> {
-    session.save().await;
-
     let templ = state.minij.get_template("home.html").unwrap();
 
     let mut css: Vec<String> = Vec::new();

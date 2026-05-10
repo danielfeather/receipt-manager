@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-forward-auth
+  namespace: receipt-manager
+spec:
+  forwardAuth:
+    address: http://traefik-forward-auth.traefik-forward-auth.svc.cluster.local:4181/auth/portals/main
+    authResponseHeaders:
+    - "X-Forwarded-User"
+    - "X-Forwarded-Displayname"
+    - "X-Authenticated-User"
+    trustForwardHeader: true

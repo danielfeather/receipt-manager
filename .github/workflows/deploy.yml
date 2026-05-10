@@ -22,7 +22,7 @@ jobs:
 
         - name: Docker meta
           id: meta
-          uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+          uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
           with:
             # list of Docker images to use as base name for tags
             images: |
@@ -32,14 +32,14 @@ jobs:
               type=sha
 
         - name: Login to GitHub Container Registry
-          uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+          uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
           with:
             registry: ghcr.io
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
         
         - name: Build and push
-          uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+          uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
           with:
             push: true
             file: container/production/Containerfile
@@ -52,13 +52,26 @@ jobs:
       permissions:
         id-token: write
         contents: read
+      environment: production
       steps:
         - name: Harden the runner (Audit all outbound calls)
           uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
           with:
             egress-policy: audit
 
-        - uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # v4.0.1
+        - uses: opentofu/setup-opentofu@847eaa4afeb791b06daa46e8eafa8b1b68d7cfb4 # main
+          with:
+            tofu_version: 1.11.6
+            checksums: |
+              273f107f1f64734fcae4753796803a24b86ae0c383e433ab64bd5542ccd18772
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v6.1.0
+          with:
+            role-to-assume: arn:aws:iam::043586862268:role/ReceiptManagerPipelineApply
+            aws-region: eu-west-2
+
+        - uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
 
         - name: Save ca
           env:
@@ -75,11 +88,24 @@ jobs:
 
         - name: Setup config
           run: |
-            ls
             kubectl config set-cluster default --server=${{ secrets.K8S_SERVER_URL }} --certificate-authority=./ca_cert.crt
             kubectl config set-credentials default --token="${{ steps.get_token.outputs.token }}"
             kubectl config set-context default --namespace=default --user=default --cluster=default
             kubectl config use-context default
+          
+        - name: OpenTofu Init
+          run: |
+            tofu init -backend-config==config/production.config
+
+        - name: OpenTofo Plan
+          env:
+            TF_VAR_hostname: ${{ secrets.HOSTNAME }}
+          run: |
+            tofu plan -var-file=vars/production.tfvars -out plan
+            
+        - name: OpenTofu Apply
+          run: |
+            tofu apply plan
 
         - name: Restart Deployment
           run: kubectl rollout restart deployment/receipt-manager -n receipt-manager

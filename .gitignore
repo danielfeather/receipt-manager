@@ -4,3 +4,5 @@ public/*
 vendor
 .vite
 .sessions
+.terraform
+.DS_STORE
