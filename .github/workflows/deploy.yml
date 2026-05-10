@@ -63,6 +63,7 @@ jobs:
           with:
             tofu_version: 1.11.6
             checksums: |
+              68026be376f8910a318645acc65f21da8b39ab86946cb0dd6cd16ef1705f34b3
               273f107f1f64734fcae4753796803a24b86ae0c383e433ab64bd5542ccd18772
 
         - name: Configure AWS Credentials
