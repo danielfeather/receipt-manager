@@ -104,17 +104,19 @@ jobs:
             kubectl config use-context default
           
         - name: OpenTofu Init
+          working-directory: ./terraform
           run: |
-            cd terraform
             tofu init -backend-config=config/production.config
 
         - name: OpenTofo Plan
+          working-directory: ./terraform
           env:
             TF_VAR_hostname: ${{ secrets.HOSTNAME }}
           run: |
             tofu plan -var-file=vars/production.tfvars -out plan
             
         - name: OpenTofu Apply
+          working-directory: ./terraform
           run: |
             tofu apply plan
 
