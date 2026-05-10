@@ -67,7 +67,7 @@ jobs:
               273f107f1f64734fcae4753796803a24b86ae0c383e433ab64bd5542ccd18772
 
         - name: Configure AWS Credentials
-          uses: aws-actions/configure-aws-credentials@v6.1.0
+          uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
           with:
             role-to-assume: arn:aws:iam::043586862268:role/ReceiptManagerPipelineApply
             aws-region: eu-west-2
