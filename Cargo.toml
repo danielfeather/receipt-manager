@@ -3,4 +3,18 @@ name = "receipt-manager"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+debug = []
+
 [dependencies]
+axum = { version = "0.8.9" }
+tokio = { version = "1.52.3", features = ["full"] }
+minijinja = { version = "2.19.0", features = ["loader"] }
+serde = { version = "1.0.228", features = ["derive"] }
+tower-http = { version = "0.6.10", features = ["fs"] }
+tower = "0.5.3"
+serde_json = "1.0.149"
+tower-sessions = { version = "0.15.0", features = ["signed"] }
+tower-sessions-file-store = "0.2.0"
+time = "0.3.47"
+async-trait = "0.1.89"
