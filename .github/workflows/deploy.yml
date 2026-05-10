@@ -101,7 +101,8 @@ jobs:
           
         - name: OpenTofu Init
           run: |
-            tofu init -backend-config==config/production.config
+            cd terraform
+            tofu init -backend-config=config/production.config
 
         - name: OpenTofo Plan
           env:
