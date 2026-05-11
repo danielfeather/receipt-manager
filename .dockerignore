@@ -3,3 +3,5 @@ vendor
 .vite
 .sessions
 target
+*.pem
+traefik.yaml

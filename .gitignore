@@ -6,3 +6,4 @@ vendor
 .sessions
 .terraform
 .DS_STORE
+*.pem

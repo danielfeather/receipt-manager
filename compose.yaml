@@ -1,0 +1,34 @@
+services:
+  traefik:
+    image: traefik:v3.7
+    command:
+      - '--api.insecure=true'
+      - '--providers.file.directory=/etc/traefik/dynamic'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+    labels:
+      - 'traefik.http.middlewares.redirect-https.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.redirect-https.redirectscheme.permanent=true'
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - './traefik.yaml:/etc/traefik/dynamic/traefik.yml'
+      - './cert.pem:/etc/certs/cert.pem'
+      - './key.pem:/etc/certs/key.pem'
+  app:
+    build:
+      context: .
+      dockerfile: container/development/Containerfile
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.receipts.tls=true'
+      - 'traefik.http.routers.receipts.rule=Host(`receipts.localhost`)'
+      - 'traefik.http.services.receipts.loadbalancer.server.port=3000'
+    volumes:
+      - ./:/opt/receipt-manager
+  

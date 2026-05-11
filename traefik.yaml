@@ -1,0 +1,7 @@
+tls:
+  options:
+    default:
+      sniStrict: true
+  certificates:
+    - certFile: /etc/certs/cert.pem
+      keyFile: /etc/certs/key.pem
