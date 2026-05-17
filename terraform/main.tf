@@ -43,7 +43,7 @@ resource "kubernetes_deployment_v1" "this" {
           }
           container {
             name = "receipt-manager"
-            image = "ghcr.io/danielfeather/receipt-manager:main"
+            image = var.image
             image_pull_policy = "Always"
             port {
               name = "http"

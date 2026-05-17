@@ -14,6 +14,8 @@ jobs:
         contents: read
         packages: write
       runs-on: ubuntu-24.04-arm
+      outputs:
+        image: ghcr.io/${{ github.repository }}@${{ steps.build.outputs.digest }}
       steps:
         - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -43,7 +45,8 @@ jobs:
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
-        - name: Build and push
+        - id: build
+          name: Build and push
           uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
           with:
             push: true
@@ -112,14 +115,12 @@ jobs:
           working-directory: ./terraform
           env:
             TF_VAR_hostname: ${{ secrets.HOSTNAME }}
+            IMAGE: ${{ needs.build.outputs.image }}
           run: |
-            tofu plan -var-file=vars/production.tfvars -out plan
+            tofu plan -var="image=${IMAGE}" -var-file=vars/production.tfvars -out plan
             
         - name: OpenTofu Apply
           working-directory: ./terraform
           run: |
             tofu apply plan
-
-        - name: Restart Deployment
-          run: kubectl rollout restart deployment/receipt-manager -n receipt-manager
             
