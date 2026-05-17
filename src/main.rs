@@ -71,7 +71,6 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-#[debug_handler]
 async fn home(
     State(state): State<Arc<AppState>>,
     session: Session,
