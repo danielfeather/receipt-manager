@@ -4,12 +4,15 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [tailwindcss()],
   publicDir: false,
-  // server: {
-  //   cors: {
-  //     // the origin you will be accessing via browser
-  //     origin: `${Deno.env.get("PROTO")}://${Deno.env.get("HOST")}`,
-  //   },
-  // },
+  server: {
+    watch: {
+      ignored: ["**/terraform", "**/vendor", "**/target"],
+    },
+    cors: {
+      // the origin you will be accessing via browser
+      origin: `${Deno.env.get("PROTO")}://${Deno.env.get("HOST")}`,
+    },
+  },
   build: {
     manifest: true,
     emptyOutDir: false,

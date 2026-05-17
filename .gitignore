@@ -7,3 +7,4 @@ vendor
 .terraform
 .DS_STORE
 *.pem
+.env

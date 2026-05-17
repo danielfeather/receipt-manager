@@ -2,7 +2,7 @@
     "tasks": {
         "dev": "OTEL_SERVICE_NAME=vite deno run -A npm:vite --host 0.0.0.0 & deno run server:start",
         "build": "deno run -A npm:vite build",
-        "server:start": "cargo run",
+        "server:start": "cargo run --features=debug",
         "serve": "deno run build && deno run --cached-only server:start"
     },
     "vendor": true,
@@ -12,6 +12,6 @@
         "feather-icons": "npm:feather-icons@^4.29.2",
         "sass-embedded": "npm:sass-embedded@^1.93.3",
         "tailwindcss": "npm:tailwindcss@^4.1.18",
-        "vite": "npm:vite@^7.2.2"
+        "vite": "npm:vite@^8.0.10"
     }
 }

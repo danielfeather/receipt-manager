@@ -5,3 +5,4 @@ vendor
 target
 *.pem
 traefik.yaml
+.github
