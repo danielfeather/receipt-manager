@@ -57,7 +57,11 @@
       <hr class="border-slate-200" />
       <section class="space-y-4">
         <h2 class="font-bold text-2xl">Receipts</h2>
-        <div class="flex"></div>
+        <div class="flex flex-wrap">
+          {% for receipt in receipts %}
+          <article class="w-full">{{ receipt }}</article>
+          {% endfor %}
+        </div>
       </section>
     </main>
     {% for file in scripts %}
