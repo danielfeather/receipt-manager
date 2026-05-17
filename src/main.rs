@@ -1,8 +1,9 @@
 #[cfg(not(feature = "debug"))]
 use assets::Manifest;
 use axum::{
-    Router,
+    Router, debug_handler,
     extract::State,
+    http::StatusCode,
     response::Html,
     routing::{get, post},
 };
@@ -15,7 +16,7 @@ use tower_sessions::{
     cookie::{Key, time::Duration},
 };
 
-use crate::session::FileSessionStorage;
+use crate::{flash::Flash, session::FileSessionStorage};
 
 mod assets;
 mod flash;
@@ -56,6 +57,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(home))
         .route("/upload", post(upload::upload))
+        .route("/success", get(upload::success))
         .layer(session_layer)
         .fallback_service(ServeDir::new("public"))
         .with_state(Arc::new(AppState {
@@ -69,11 +71,11 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn home(State(state): State<Arc<AppState>>, _session: Session) -> Html<String> {
-    let env = state.loader.acquire_env().unwrap();
-
-    let templ = env.get_template("home.html").unwrap();
-
+#[debug_handler]
+async fn home(
+    State(state): State<Arc<AppState>>,
+    session: Session,
+) -> axum::response::Result<Html<String>> {
     let scripts = assets::resolve_scripts(
         Path::new("client/main.ts"),
         #[cfg(not(feature = "debug"))]
@@ -90,9 +92,13 @@ async fn home(State(state): State<Arc<AppState>>, _session: Session) -> Html<Str
         None,
     );
 
+    let env = state.loader.acquire_env().unwrap();
+
+    let templ = env.get_template("home.html").unwrap();
+
     let res = templ
         .render(context! { css => css, scripts => scripts })
         .unwrap();
 
-    Html(res)
+    Ok(Html(res))
 }
