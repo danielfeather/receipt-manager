@@ -114,10 +114,10 @@ jobs:
         - name: OpenTofo Plan
           working-directory: ./terraform
           env:
+            TF_VAR_image: ${{ needs.build.outputs.image }}
             TF_VAR_hostname: ${{ secrets.HOSTNAME }}
-            IMAGE: ${{ needs.build.outputs.image }}
           run: |
-            tofu plan -var="image=${IMAGE}" -var-file=vars/production.tfvars -out plan
+            tofu plan -out plan
             
         - name: OpenTofu Apply
           working-directory: ./terraform
