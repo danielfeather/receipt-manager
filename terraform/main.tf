@@ -51,6 +51,13 @@ resource "kubernetes_deployment_v1" "this" {
               container_port = 3000
               protocol = "TCP"
             }
+
+            env_from {
+              secret_ref {
+                name = "aws-credentials"
+              }
+            }
+            
             liveness_probe {
               http_get {
                 path = "/"
