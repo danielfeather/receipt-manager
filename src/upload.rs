@@ -1,19 +1,12 @@
 use std::{fmt::Write as _, path::Path, sync::Arc};
 
-use aws_config::{
-    BehaviorVersion, environment::EnvironmentVariableCredentialsProvider,
-    meta::region::RegionProviderChain, sts::AssumeRoleProvider,
-};
-use aws_sdk_s3::{
-    Client,
-    config::{ProvideCredentials, Region},
-    primitives::{ByteStream, SdkBody},
-};
+use aws_config::{BehaviorVersion, meta::region::RegionProviderChain, sts::AssumeRoleProvider};
+use aws_sdk_s3::{Client, config::Region};
 use axum::{
     body::Bytes,
     extract::{Multipart, State},
     http::StatusCode,
-    response::{ErrorResponse, Html, IntoResponse, Redirect, Response},
+    response::{Html, IntoResponse, Redirect, Response},
 };
 use minijinja::context;
 use tower_sessions::Session;
@@ -22,14 +15,13 @@ use uuid::Uuid;
 use crate::{AppState, assets};
 
 pub async fn upload(
-    State(state): State<Arc<AppState>>,
     session: Session,
     mut multipart: Multipart,
 ) -> axum::response::Result<Redirect> {
     let mut name: Option<String> = None;
     let mut data: Option<Bytes> = None;
 
-    while let Some(mut field) = multipart.next_field().await? {
+    while let Some(field) = multipart.next_field().await? {
         let field_name = field.name().unwrap().to_string();
 
         if field_name == "name" {
@@ -91,7 +83,7 @@ pub async fn upload(
         .send()
         .await
         .map_err(|e| {
-            println!("{e:?}");
+            tracing::error!("Failed to upload receipt, got S3 error: {e}");
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Failed to upload receipt",
@@ -99,7 +91,9 @@ pub async fn upload(
         })?;
 
     match session.insert("filename", filename).await {
-        Err(e) => println!("{e:?}"),
+        Err(e) => {
+            tracing::error!("Failed to update session: {e}")
+        }
         _ => {}
     }
 

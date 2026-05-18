@@ -16,15 +16,13 @@ use minijinja_autoreload::AutoReloader;
 use std::{path::Path, sync::Arc};
 use tower_http::services::ServeDir;
 use tower_sessions::{
-    Expiry, Session, SessionManagerLayer,
+    Expiry, MemoryStore, SessionManagerLayer,
     cookie::{Key, time::Duration},
 };
-
-use crate::session::FileSessionStorage;
+use tracing::{debug, error};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod assets;
-mod flash;
-mod session;
 mod upload;
 
 const TEMPLATE_PATH: &str = "views";
@@ -37,6 +35,15 @@ struct AppState {
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| format!("{}=debug", env!("CARGO_CRATE_NAME")).into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    #[allow(unused)]
     let maybe_manifest = assets::load_manifest();
 
     let key = Key::generate();
@@ -48,12 +55,11 @@ async fn main() {
         Ok(env)
     });
 
-    let session_store = FileSessionStorage::new();
+    let session_store = MemoryStore::default();
 
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(true)
-        .with_expiry(Expiry::OnInactivity(Duration::seconds(10)))
-        .with_http_only(true)
+        .with_expiry(Expiry::OnInactivity(Duration::hours(12)))
         .with_always_save(true)
         .with_signed(key);
 
@@ -72,6 +78,8 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
+    tracing::info!("Listening on 0.0.0.0:3000");
+
     axum::serve(listener, app).await.unwrap();
 }
 
@@ -83,6 +91,7 @@ async fn home(State(state): State<Arc<AppState>>) -> axum::response::Result<Html
         #[cfg(feature = "debug")]
         None,
     );
+    debug!("Loaded scripts");
 
     let css = assets::resolve_css(
         Path::new("client/main.ts"),
@@ -91,7 +100,9 @@ async fn home(State(state): State<Arc<AppState>>) -> axum::response::Result<Html
         #[cfg(feature = "debug")]
         None,
     );
+    debug!("Loaded css");
 
+    debug!("attempting to read IAM_ROLE");
     let role_arn = std::env::var("IAM_ROLE")
         .map_err(|_| (StatusCode::SERVICE_UNAVAILABLE, "Service is misconfigured"))?;
 
@@ -119,12 +130,16 @@ async fn home(State(state): State<Arc<AppState>>) -> axum::response::Result<Html
     let bucket_name = std::env::var("S3_BUCKET")
         .map_err(|_| (StatusCode::SERVICE_UNAVAILABLE, "Service is misconfigured"))?;
 
+    debug!("attempting to list objects");
     let response = client
         .list_objects_v2()
         .bucket(bucket_name)
         .send()
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            error!("Failed to list receipts: {e}");
+            (StatusCode::INTERNAL_SERVER_ERROR, "Failed to list receipts")
+        })?;
 
     let objects = response.contents();
 
