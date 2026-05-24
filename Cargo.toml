@@ -21,6 +21,6 @@ async-trait = "0.1.89"
 minijinja-autoreload = { version = "2.19.0" }
 uuid = { version = "1.23.1", features = ["serde", "v7"] }
 aws-sdk-s3 = "1.132.0"
-aws-config = { version = "1.8.16", features = ["behavior-version-latest"] }
+aws-config = { version = "1.8.17", features = ["behavior-version-latest"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
