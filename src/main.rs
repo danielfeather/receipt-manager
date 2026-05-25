@@ -13,6 +13,7 @@ use axum::{
 };
 use minijinja::{Environment, context, path_loader};
 use minijinja_autoreload::AutoReloader;
+use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use std::{path::Path, sync::Arc};
 use tower_http::services::ServeDir;
 use tower_sessions::{
@@ -31,6 +32,7 @@ struct AppState {
     loader: AutoReloader,
     #[cfg(not(feature = "debug"))]
     manifest: Manifest,
+    pool: Pool<Postgres>,
 }
 
 #[tokio::main]
@@ -45,6 +47,16 @@ async fn main() {
 
     #[allow(unused)]
     let maybe_manifest = assets::load_manifest();
+
+    debug!("attempting to read DATABASE_URL");
+    let database_url = std::env::var("DATABASE_URL")
+        .expect("Unable to connect to DB, DATABASE_URL is not present in env");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await
+        .expect("Unable to connect to DB");
 
     let key = Key::generate();
 
@@ -74,6 +86,7 @@ async fn main() {
             loader: reloader,
             #[cfg(not(feature = "debug"))]
             manifest: maybe_manifest.expect("Unable to find asset manifest"),
+            pool,
         }));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
