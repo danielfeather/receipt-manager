@@ -24,7 +24,7 @@ use tracing::{debug, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod assets;
-mod upload;
+mod routes;
 
 const TEMPLATE_PATH: &str = "views";
 
@@ -78,8 +78,8 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         .route("/", get(home))
-        .route("/upload", post(upload::upload))
-        .route("/success", get(upload::success))
+        .route("/upload", post(routes::upload::upload))
+        .route("/success", get(routes::upload::success))
         .layer(session_layer)
         .fallback_service(ServeDir::new("public"))
         .with_state(Arc::new(AppState {
