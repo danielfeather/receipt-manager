@@ -11,7 +11,7 @@ FROM denoland/deno:2.7.14 AS deno
 
 WORKDIR /build
 
-COPY deno.json deno.lock styles.css vite.config.ts ./
+COPY deno.json deno.lock styles.scss vite.config.ts ./
 COPY views ./views
 COPY client ./client
 
