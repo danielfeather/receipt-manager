@@ -10,14 +10,12 @@ use axum::{
 };
 use minijinja::context;
 use tower_sessions::Session;
+use tracing::debug;
 use uuid::Uuid;
 
-use crate::{AppState, assets};
+use crate::{AppState, PAGES, assets};
 
-pub async fn upload(
-    session: Session,
-    mut multipart: Multipart,
-) -> axum::response::Result<Redirect> {
+pub async fn post(session: Session, mut multipart: Multipart) -> axum::response::Result<Redirect> {
     let mut name: Option<String> = None;
     let mut data: Option<Bytes> = None;
 
@@ -131,10 +129,38 @@ pub async fn success(
 
     let env = state.loader.acquire_env().unwrap();
 
-    let templ = env.get_template("success.html").unwrap();
+    let templ = env.get_template("success.njk").unwrap();
 
     let res = templ
-        .render(context! { css => css, scripts => scripts, filename => filename })
+        .render(context! { css => css, scripts => scripts, filename => filename, pages => PAGES, active => 1 })
+        .unwrap();
+
+    Ok(Html(res).into_response())
+}
+
+pub async fn get(State(state): State<Arc<AppState>>) -> axum::response::Result<Response> {
+    let scripts = assets::resolve_scripts(
+        Path::new("client/main.ts"),
+        #[cfg(not(feature = "debug"))]
+        Some(&state.manifest),
+        #[cfg(feature = "debug")]
+        None,
+    );
+    debug!("Loaded scripts");
+
+    let css = assets::resolve_css(
+        Path::new("client/main.ts"),
+        #[cfg(not(feature = "debug"))]
+        Some(&state.manifest),
+        #[cfg(feature = "debug")]
+        None,
+    );
+    let env = state.loader.acquire_env().unwrap();
+
+    let res = env
+        .get_template("upload.njk")
+        .unwrap()
+        .render(context! { css => css, scripts => scripts, pages => PAGES, active => 1 })
         .unwrap();
 
     Ok(Html(res).into_response())

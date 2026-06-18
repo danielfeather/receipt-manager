@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" class="govuk-template">
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      {{ title }}
+    </title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    {% for file in css %}
+    <link href="/{{ file }}" rel="stylesheet" />
+    {% endfor %}
+  </head>
+
+  <body class="govuk-template__body govuk-body">
+    <script>
+      document.body.className +=
+        " js-enabled" +
+        ("noModule" in HTMLScriptElement.prototype
+          ? " govuk-frontend-supported"
+          : "");
+    </script>
+    <a
+      href="#main-content"
+      class="govuk-skip-link"
+      data-module="govuk-skip-link"
+      >Skip to main content</a
+    >
+    {% include 'header.njk' %}
+    <div class="govuk-width-container">
+      <main class="govuk-main-wrapper" id="main-content">
+      {% block body %} {% endblock %}
+      </main>
+    </div>
+    <footer class="govuk-template__footer">
+      <div class="govuk-footer">
+        <div class="govuk-width-container">
+          <div class="govuk-footer__meta">
+            <div
+              class="govuk-footer__meta-item govuk-footer__meta-item--grow"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    {% for file in scripts %}
+    <script type="module" src="{{ file }}"></script>
+    {% endfor %}
+  </body>
+</html>

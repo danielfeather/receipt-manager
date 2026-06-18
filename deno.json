@@ -10,8 +10,8 @@
     "imports": {
         "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
         "feather-icons": "npm:feather-icons@^4.29.2",
-        "sass-embedded": "npm:sass-embedded@^1.93.3",
-        "tailwindcss": "npm:tailwindcss@^4.1.18",
+        "govuk-frontend": "npm:govuk-frontend@^6.2.0",
+        "sass-embedded": "npm:sass-embedded@^1.100.0",
         "vite": "npm:vite@^8.0.10"
     }
 }

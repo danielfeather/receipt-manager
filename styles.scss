@@ -1,0 +1,6 @@
+$font-family: arial, sans-serif;
+
+@use "govuk-frontend/dist/govuk" as * with (
+  $govuk-font-family: $font-family,
+  $govuk-global-styles: true
+);

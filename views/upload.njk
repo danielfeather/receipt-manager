@@ -1,0 +1,31 @@
+{% extends "page.njk" %} 
+{% block body %}
+<form
+  action="/upload"
+  method="post"
+  enctype="multipart/form-data"
+>
+  <div class="govuk-form-group">
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="event-name">
+        Give the receipt a name
+      </label>
+    </h1>
+    <input class="govuk-input" id="event-name" name="name" type="text">
+  </div>
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="file-upload-1">
+      Upload a file
+    </label>
+    <div
+      class="govuk-file-upload-wrapper"
+      data-module="govuk-file-upload">
+      <input class="govuk-file-upload" id="file-upload-1" name="file" type="file" multiple>
+    </div>
+  </div>
+  <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+    Upload
+  </button>
+</form>
+
+{% endblock %}

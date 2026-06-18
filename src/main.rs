@@ -8,7 +8,7 @@ use axum::{
     Router,
     extract::State,
     http::StatusCode,
-    response::Html,
+    response::{Html, IntoResponse, Redirect},
     routing::{get, post},
 };
 use minijinja::{Environment, context, path_loader};
@@ -34,6 +34,11 @@ struct AppState {
     manifest: Manifest,
     pool: Pool<Postgres>,
 }
+
+const PAGES: &'static [(&str, &str)] = &[
+    ("Manage receipts", "/receipts"),
+    ("Upload receipts", "/upload"),
+];
 
 #[tokio::main]
 async fn main() {
@@ -77,8 +82,10 @@ async fn main() {
 
     // build our application with a single route
     let app = Router::new()
-        .route("/", get(home))
-        .route("/upload", post(routes::upload::upload))
+        .route("/", get(async || Redirect::to("/receipts").into_response()))
+        .route("/receipts", get(receipts))
+        .route("/upload", get(routes::upload::get))
+        .route("/upload", post(routes::upload::post))
         .route("/success", get(routes::upload::success))
         .layer(session_layer)
         .fallback_service(ServeDir::new("public"))
@@ -96,7 +103,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn home(State(state): State<Arc<AppState>>) -> axum::response::Result<Html<String>> {
+async fn receipts(State(state): State<Arc<AppState>>) -> axum::response::Result<Html<String>> {
     let scripts = assets::resolve_scripts(
         Path::new("client/main.ts"),
         #[cfg(not(feature = "debug"))]
@@ -160,11 +167,17 @@ async fn home(State(state): State<Arc<AppState>>) -> axum::response::Result<Html
 
     let env = state.loader.acquire_env().unwrap();
 
-    let templ = env.get_template("home.html").unwrap();
+    let templ = env.get_template("receipts.njk").unwrap();
 
-    let res = templ
-        .render(context! { css => css, scripts => scripts, receipts => receipts })
-        .unwrap();
+    let res = match templ
+        .render(context! { css => css, scripts => scripts, receipts => receipts, pages => PAGES, active => 0 }) {
+            Ok(templ) => templ,
+            Err(e) => {
+                let string = format!("{e}");
+                tracing::error!(string);
+                return Ok(Html(string))
+            },
+        };
 
     Ok(Html(res))
 }

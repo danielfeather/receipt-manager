@@ -1,0 +1,16 @@
+{% extends "page.njk" %} 
+{% block body %} 
+
+  <div class="govuk-panel govuk-panel--confirmation">
+    <h1 class="govuk-panel__title">
+      Upload complete
+    </h1>
+    <div class="govuk-panel__body">
+      Your receipt was uploaded successfully for processing. <br /> 
+      <strong>{{ filename }}</strong>
+    </div>
+  </div>
+
+  <a href="/" class="govuk-link govuk-link--no-visited-state">Go back</a>
+
+{% endblock %} 
