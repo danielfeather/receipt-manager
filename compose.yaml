@@ -43,15 +43,17 @@ services:
     build:
       context: .
       dockerfile_inline: |
-        FROM rust:1.95.0-alpine3.23@sha256:606fd313a0f49743ee2a7bd49a0914bab7deedb12791f3a846a34a4711db7ed2
+        FROM rust:1.95.0
 
-        RUN cargo install sqlx-cli --no-default-features --features postgres
+        WORKDIR root
+
+        RUN cargo install sqlx-cli --no-default-features --features=postgres,native-tls
 
         CMD [ "sqlx", "migrate", "run" ]
     env_file:
       - .env
     volumes:
-      - ./migrations:/migrations
+      - ./migrations:/root/migrations
 
   db:
     image: postgres:18.4-alpine3.23@sha256:563d9a314daa3a9f8e3249e217514210a747970c36d50d83ae5e9dc6749fe354
