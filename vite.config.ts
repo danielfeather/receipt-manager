@@ -23,4 +23,9 @@ export default defineConfig({
       input: "client/main.ts",
     },
   },
+  css: {
+    lightningcss: {
+      errorRecovery: true,
+    },
+  },
 });
