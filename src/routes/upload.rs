@@ -3,10 +3,12 @@ use std::{fmt::Write as _, path::Path, sync::Arc};
 use aws_config::{BehaviorVersion, meta::region::RegionProviderChain, sts::AssumeRoleProvider};
 use aws_sdk_s3::{Client, config::Region};
 use axum::{
+    Router,
     body::Bytes,
     extract::{Multipart, State},
     http::StatusCode,
     response::{Html, IntoResponse, Redirect, Response},
+    routing::{get, post},
 };
 use minijinja::context;
 use tower_sessions::Session;
@@ -15,7 +17,14 @@ use uuid::Uuid;
 
 use crate::{AppState, PAGES, assets};
 
-pub async fn post(session: Session, mut multipart: Multipart) -> axum::response::Result<Redirect> {
+pub fn router() -> Router<Arc<AppState>> {
+    Router::new()
+        .route("/", get(form))
+        .route("/", post(post_form))
+        .route("/success", get(success))
+}
+
+async fn post_form(session: Session, mut multipart: Multipart) -> axum::response::Result<Redirect> {
     let mut name: Option<String> = None;
     let mut data: Option<Bytes> = None;
 
@@ -95,10 +104,10 @@ pub async fn post(session: Session, mut multipart: Multipart) -> axum::response:
         _ => {}
     }
 
-    Ok(Redirect::to("/success"))
+    Ok(Redirect::to("/upload/success"))
 }
 
-pub async fn success(
+async fn success(
     State(state): State<Arc<AppState>>,
     session: Session,
 ) -> axum::response::Result<Response> {
@@ -138,7 +147,7 @@ pub async fn success(
     Ok(Html(res).into_response())
 }
 
-pub async fn get(State(state): State<Arc<AppState>>) -> axum::response::Result<Response> {
+async fn form(State(state): State<Arc<AppState>>) -> axum::response::Result<Response> {
     let scripts = assets::resolve_scripts(
         Path::new("client/main.ts"),
         #[cfg(not(feature = "debug"))]

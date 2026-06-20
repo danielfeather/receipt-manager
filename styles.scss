@@ -4,3 +4,14 @@ $font-family: arial, sans-serif;
   $govuk-font-family: $font-family,
   $govuk-global-styles: true
 );
+
+.govuk-width-container {
+  max-width: 100%;
+  @include govuk-responsive-margin(6, "left");
+  @include govuk-responsive-margin(6, "right");
+}
+
+.govuk-header__container--full-width {
+  @include govuk-responsive-padding(6, "left");
+  @include govuk-responsive-padding(6, "right");
+}

@@ -1,0 +1,81 @@
+{% extends "page.njk" %} 
+{% block body %}
+<a href="/" class="govuk-back-link">Back</a>
+<h1 class="govuk-heading-l">New receipt</h1>
+<form action="/receipt/new">
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="event-name">
+            Give a brief description of the receipt
+        </label>
+        <input class="govuk-input" id="event-name" name="eventName" type="text">
+    </div>
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
+            <legend class="govuk-fieldset__legend">
+                For when is the receipt dated?
+            </legend>
+            <div id="passport-issued-hint" class="govuk-hint">
+                For example, 20 6 2026
+            </div>
+            <div class="govuk-date-input" id="passport-issued">
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="receipt_day">
+                            Day
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="receipt_day" name="receipt_day" type="text" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="receipt_month">
+                            Month
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="receipt_month" name="receipt_month" type="text" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="receipt_year">
+                            Year
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="receipt_year" name="receipt_year" type="text" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="govuk-button-group">
+    <button name="submit" type="submit" class="govuk-button" data-module="govuk-button">
+        Save and continue
+    </button>
+    <button name="save_as_draft" type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+        Save as draft
+    </button>
+    </div>
+</form>
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">
+    Line Items
+    <a draggable="false" href="/receipts/new" role="button" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">Add</a>
+  </caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Description</th>
+      <th scope="col" class="govuk-table__header">Unit Price</th>
+      <th scope="col" class="govuk-table__header"></th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for receipt in [1,2,3,4] %}
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">LINDAHL WHITE CHOC</td>
+      <td class="govuk-table__cell">
+        £1.25
+      </td>
+      <td class="govuk-table__cell"><a href="/receipts/{{ receipt }}" class="govuk-link">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

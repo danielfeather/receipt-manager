@@ -1,6 +1,6 @@
 <header class="govuk-template__header">
     <div class="govuk-header">
-    <div class="govuk-header__container govuk-width-container">
+    <div class="govuk-header__container govuk-header__container--full-width">
         <div class="govuk-header__logo">
         <a href="/" class="govuk-header__homepage-link">
             <span class="govuk-header__product-name">Financial Management System</span>
@@ -12,31 +12,31 @@
 <section aria-label="Service information" class="govuk-service-navigation"
     data-module="govuk-service-navigation">
     <div class="govuk-width-container">
-    <div class="govuk-service-navigation__container">
-        <span class="govuk-service-navigation__service-name">
-        <a href="#" class="govuk-service-navigation__link">
-            Receipts
-        </a>
-        </span>
-        <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
-        <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden aria-hidden="true">
-            Menu
-        </button>
-        <ul class="govuk-service-navigation__list" id="navigation">
-            {% for (page, link) in pages %}
-            <li class="govuk-service-navigation__item {{ "govuk-service-navigation__item--active" if loop.index0 == active }}">
-                <a class="govuk-service-navigation__link" href="{{ link }}">
-                    {% if loop.index0 == active %}
-                        <strong class="govuk-service-navigation__active-fallback">{{ page }}</strong>
-                    {% else %}
-                        {{ page }}
-                    {% endif %}
-                </a>
-            </li>
-            {% endfor %}            
-        </ul>
-        </nav>
-    </div>
+        <div class="govuk-service-navigation__container">
+            <span class="govuk-service-navigation__service-name">
+            <a href="#" class="govuk-service-navigation__link">
+                Receipts
+            </a>
+            </span>
+            <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
+            <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden aria-hidden="true">
+                Menu
+            </button>
+            <ul class="govuk-service-navigation__list" id="navigation">
+                {% for (page, link) in pages %}
+                <li class="govuk-service-navigation__item {{ "govuk-service-navigation__item--active" if loop.index0 == active }}">
+                    <a class="govuk-service-navigation__link" href="{{ link }}">
+                        {% if loop.index0 == active %}
+                            <strong class="govuk-service-navigation__active-fallback">{{ page }}</strong>
+                        {% else %}
+                            {{ page }}
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}            
+            </ul>
+            </nav>
+        </div>
     </div>
 </section>
 <div class="govuk-phase-banner govuk-width-container">

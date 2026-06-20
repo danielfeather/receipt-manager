@@ -1,7 +1,10 @@
 {% extends "page.njk" %} 
 {% block body %} 
 <table class="govuk-table">
-  <caption class="govuk-table__caption govuk-table__caption--m">Receipts</caption>
+  <caption class="govuk-table__caption govuk-table__caption--l">
+    Receipts
+    <a draggable="false" href="/receipts/new" role="button" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">New</a>
+  </caption>
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th scope="col" class="govuk-table__header">Name</th>
@@ -14,11 +17,11 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell">{{ receipt }}</td>
       <td class="govuk-table__cell">
-        <strong class="govuk-tag govuk-tag--yellow">
+        <strong class="govuk-tag govuk-tag--grey">
           Pending
         </strong>
       </td>
-      <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+      <td class="govuk-table__cell"><a href="/receipts/{{ receipt }}" class="govuk-link">View</a></td>
     </tr>
     {% endfor %}
   </tbody>

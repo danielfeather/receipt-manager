@@ -83,10 +83,8 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         .route("/", get(async || Redirect::to("/receipts").into_response()))
-        .route("/receipts", get(receipts))
-        .route("/upload", get(routes::upload::get))
-        .route("/upload", post(routes::upload::post))
-        .route("/success", get(routes::upload::success))
+        .nest("/receipts", routes::receipts::router())
+        .nest("/upload", routes::upload::router())
         .layer(session_layer)
         .fallback_service(ServeDir::new("public"))
         .with_state(Arc::new(AppState {
@@ -101,83 +99,4 @@ async fn main() {
     tracing::info!("Listening on 0.0.0.0:3000");
 
     axum::serve(listener, app).await.unwrap();
-}
-
-async fn receipts(State(state): State<Arc<AppState>>) -> axum::response::Result<Html<String>> {
-    let scripts = assets::resolve_scripts(
-        Path::new("client/main.ts"),
-        #[cfg(not(feature = "debug"))]
-        Some(&state.manifest),
-        #[cfg(feature = "debug")]
-        None,
-    );
-    debug!("Loaded scripts");
-
-    let css = assets::resolve_css(
-        Path::new("client/main.ts"),
-        #[cfg(not(feature = "debug"))]
-        Some(&state.manifest),
-        #[cfg(feature = "debug")]
-        None,
-    );
-    debug!("Loaded css");
-
-    debug!("attempting to read IAM_ROLE");
-    let role_arn = std::env::var("IAM_ROLE")
-        .map_err(|_| (StatusCode::SERVICE_UNAVAILABLE, "Service is misconfigured"))?;
-
-    let region_provider = RegionProviderChain::first_try(Region::new("us-west-2"));
-
-    let shared_config = aws_config::defaults(BehaviorVersion::latest())
-        .region(region_provider)
-        .load()
-        .await;
-
-    let provider = AssumeRoleProvider::builder(role_arn)
-        .configure(&shared_config)
-        .session_name("testAR")
-        .build()
-        .await;
-
-    let local_config = aws_config::defaults(BehaviorVersion::latest())
-        .region(Region::new("eu-west-2"))
-        .credentials_provider(provider)
-        .load()
-        .await;
-
-    let client = Client::new(&local_config);
-
-    let bucket_name = std::env::var("S3_BUCKET")
-        .map_err(|_| (StatusCode::SERVICE_UNAVAILABLE, "Service is misconfigured"))?;
-
-    debug!("attempting to list objects");
-    let response = client
-        .list_objects_v2()
-        .bucket(bucket_name)
-        .send()
-        .await
-        .map_err(|e| {
-            error!("Failed to list receipts: {e}");
-            (StatusCode::INTERNAL_SERVER_ERROR, "Failed to list receipts")
-        })?;
-
-    let objects = response.contents();
-
-    let receipts: Vec<&str> = objects.iter().filter_map(|ob| ob.key()).collect();
-
-    let env = state.loader.acquire_env().unwrap();
-
-    let templ = env.get_template("receipts.njk").unwrap();
-
-    let res = match templ
-        .render(context! { css => css, scripts => scripts, receipts => receipts, pages => PAGES, active => 0 }) {
-            Ok(templ) => templ,
-            Err(e) => {
-                let string = format!("{e}");
-                tracing::error!(string);
-                return Ok(Html(string))
-            },
-        };
-
-    Ok(Html(res))
 }
