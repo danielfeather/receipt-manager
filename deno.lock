@@ -3,6 +3,7 @@
   "specifiers": {
     "npm:govuk-frontend@^6.2.0": "6.2.0",
     "npm:sass-embedded@^1.100.0": "1.100.0",
+    "npm:vite@*": "8.0.16_sass-embedded@1.100.0",
     "npm:vite@^8.0.16": "8.0.16_sass-embedded@1.100.0"
   },
   "npm": {
