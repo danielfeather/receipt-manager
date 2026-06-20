@@ -10,6 +10,6 @@
     "imports": {
         "govuk-frontend": "npm:govuk-frontend@^6.2.0",
         "sass-embedded": "npm:sass-embedded@^1.100.0",
-        "vite": "npm:vite@^8.0.10"
+        "vite": "npm:vite@^8.0.16"
     }
 }
