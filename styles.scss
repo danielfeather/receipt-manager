@@ -15,3 +15,7 @@ $font-family: arial, sans-serif;
   @include govuk-responsive-padding(6, "left");
   @include govuk-responsive-padding(6, "right");
 }
+
+:root {
+  --govuk-brand-colour: black;
+}

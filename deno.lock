@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:govuk-frontend@^6.2.0": "6.2.0",
+    "npm:govuk-frontend@^6.3.0": "6.3.0",
     "npm:sass-embedded@^1.100.0": "1.100.0",
     "npm:vite@*": "8.0.16_sass-embedded@1.100.0",
     "npm:vite@^8.0.16": "8.0.16_sass-embedded@1.100.0"
@@ -260,8 +260,8 @@
       "os": ["darwin"],
       "scripts": true
     },
-    "govuk-frontend@6.2.0": {
-      "integrity": "sha512-PCRyQT+7kiV2dUz0Ku6Co+Nx4anOwJ7mAduXYbTQHK2krppBSynv9dBXtOYha/8j+LIzK7FqesTbJl9HD6ekHg=="
+    "govuk-frontend@6.3.0": {
+      "integrity": "sha512-cXIQxm5PHCsbic47GXZrVBZhAeeshTLRL6ZBKilLsR6rMCjJuWb7Fruq0VUNMBJFlJk/srsRj/q8d5bM9cgKoA=="
     },
     "has-flag@4.0.0": {
       "integrity": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ=="
@@ -617,7 +617,7 @@
   },
   "workspace": {
     "dependencies": [
-      "npm:govuk-frontend@^6.2.0",
+      "npm:govuk-frontend@^6.3.0",
       "npm:sass-embedded@^1.100.0",
       "npm:vite@^8.0.16"
     ]
